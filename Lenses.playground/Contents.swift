@@ -39,9 +39,52 @@ struct Lens<Whole, Part> {
 let personNameLens = Lens<Person, String>(
     get: { $0.name },
     set: { (newName, person) in
-        return Person(name: newName, address: person.address)
+        Person(name: newName, address: person.address)
     }
 )
 
 
 personNameLens.set("narf", narf)
+
+
+
+let personAddressLens = Lens<Person, Address>(
+    get: { $0.address },
+    set: { (newAddress, person) in
+        Person(name: person.name, address: newAddress)
+    }
+)
+
+let addressStreetLens = Lens<Address, String>(
+    get: { $0.street },
+    set: { (newStreet, address) in
+        Address(street: newStreet)
+    }
+)
+
+
+
+extension Lens {
+    func compose<Subpart>(other: Lens<Part, Subpart>) -> Lens<Whole, Subpart> {
+        return Lens<Whole, Subpart>(
+            get: { whole in
+                let part = self.get(whole)
+                let subpart = other.get(part)
+
+                return subpart
+            },
+            set: { (newSubpart, whole) in
+                let part = self.get(whole)
+                let newPart = other.set(newSubpart, part)
+                let newWhole = self.set(newPart, whole)
+
+                return newWhole
+            }
+        )
+    }
+}
+
+
+let personStreetLens = personAddressLens.compose(addressStreetLens)
+personStreetLens.get(narf)
+
