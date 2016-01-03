@@ -1,5 +1,47 @@
-//: Playground - noun: a place where people can play
+struct Person {
+    let name: String
+    let address: Address
+}
 
-import Cocoa
+struct Address {
+    let street: String
+}
 
-var str = "Hello, playground"
+
+
+
+extension Person: CustomDebugStringConvertible {
+    var debugDescription: String {
+        return "\(name) from \(address)"
+    }
+}
+
+extension Address: CustomDebugStringConvertible {
+    var debugDescription: String {
+        return street
+    }
+}
+
+
+
+
+let narf = Person(name: "Maciej Konieczny", address: Address(street: "Sesame Street"))
+
+
+
+struct Lens<Whole, Part> {
+    let get: Whole -> Part
+    let set: (Part, Whole) -> Whole
+}
+
+
+
+let personNameLens = Lens<Person, String>(
+    get: { $0.name },
+    set: { (newName, person) in
+        return Person(name: newName, address: person.address)
+    }
+)
+
+
+personNameLens.set("narf", narf)
