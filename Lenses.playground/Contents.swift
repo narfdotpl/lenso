@@ -88,3 +88,22 @@ extension Lens {
 let personStreetLens = personAddressLens.compose(addressStreetLens)
 personStreetLens.get(narf)
 
+
+
+extension Person {
+    struct Lenses {
+        static let name = personNameLens
+        static let address = personAddressLens
+    }
+}
+
+
+extension Address {
+    struct Lenses {
+        static let street = addressStreetLens
+    }
+}
+
+
+
+Person.Lenses.name.set("Kuba", narf)
