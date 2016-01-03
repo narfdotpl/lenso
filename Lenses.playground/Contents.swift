@@ -107,3 +107,58 @@ extension Address {
 
 
 Person.Lenses.name.set("Kuba", narf)
+
+
+
+protocol BoundLens {
+    typealias Whole
+    typealias Part
+
+    var _instance: Whole { get }
+    var _lens: Lens<Whole, Part> { get }
+
+    func get() -> Part
+    func set(newPart: Part) -> Whole
+}
+
+extension BoundLens {
+    func get() -> Part {
+        return _lens.get(_instance)
+    }
+
+    func set(newPart: Part) -> Whole {
+        return _lens.set(newPart, _instance)
+    }
+}
+
+struct GenericBoundLens<A, B>: BoundLens {
+    typealias Whole = A
+    typealias Part = B
+
+    let _instance: Whole
+    let _lens: Lens<Whole, Part>
+}
+
+
+
+extension Person {
+    struct BoundLenses {
+        let _instance: Person
+
+        var name: GenericBoundLens<Person, String> {
+            return GenericBoundLens<Person, String>(
+                _instance: self._instance,
+                _lens: Person.Lenses.name
+            )
+        }
+    }
+
+    var lenses: BoundLenses {
+        return BoundLenses(_instance: self)
+    }
+}
+
+
+
+narf.lenses.name.get()
+narf.lenses.name.set("narf")
