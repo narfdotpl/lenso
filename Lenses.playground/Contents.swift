@@ -181,8 +181,27 @@ extension Person {
 }
 
 
+extension Address {
+    struct BoundLenses {
+        let _instance: Address
+
+        var street: GenericBoundLens<Address, String> {
+            return GenericBoundLens<Address, String>(
+                _instance: self._instance,
+                _lens: Address.Lenses.street
+            )
+        }
+    }
+
+    var lenses: BoundLenses {
+        return BoundLenses(_instance: self)
+    }
+}
+
+
 
 narf.lenses.name.get()
 narf.lenses.name.set("narf")
 
 narf.lenses.address.street.set("Baker Street")
+narf.address.lenses.street.set("Baker Street")
