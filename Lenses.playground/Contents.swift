@@ -109,72 +109,68 @@ extension Address {
 Person.Lenses.name.set("Kuba", narf)
 
 
+struct BoundLensStorage<Whole, Part> {
+    let instance: Whole
+    let lens: Lens<Whole, Part>
+}
 
-protocol BoundLens {
+protocol BoundLensType {
     typealias Whole
     typealias Part
 
-    var _instance: Whole { get }
-    var _lens: Lens<Whole, Part> { get }
+    init(boundLensStorage: BoundLensStorage<Whole, Part>)
+
+    var boundLensStorage: BoundLensStorage<Whole, Part> { get }
 
     func get() -> Part
     func set(newPart: Part) -> Whole
 }
 
-extension BoundLens {
+extension BoundLensType {
+    init(instance: Whole, lens: Lens<Whole, Part>) {
+        self.init(boundLensStorage: BoundLensStorage(instance: instance, lens: lens))
+    }
+
+    init<Parent: BoundLensType where Parent.Whole == Whole>(parent: Parent, sublens: Lens<Parent.Part, Part>) {
+        let storage = parent.boundLensStorage
+        self.init(instance: storage.instance, lens: storage.lens.compose(sublens))
+    }
+
     func get() -> Part {
-        return _lens.get(_instance)
+        return boundLensStorage.lens.get(boundLensStorage.instance)
     }
 
     func set(newPart: Part) -> Whole {
-        return _lens.set(newPart, _instance)
+        return boundLensStorage.lens.set(newPart, boundLensStorage.instance)
     }
 }
 
-struct GenericBoundLens<A, B>: BoundLens {
-    typealias Whole = A
-    typealias Part = B
 
-    let _instance: Whole
-    let _lens: Lens<Whole, Part>
+struct BoundLens<Whole, Part>: BoundLensType {
+    let boundLensStorage: BoundLensStorage<Whole, Part>
 }
 
 
-
-struct GenericPersonBoundLens<A>: BoundLens {
-    typealias Whole = A
+struct BoundLensToPerson<Whole>: BoundLensType {
     typealias Part = Person
+    let boundLensStorage: BoundLensStorage<Whole, Part>
 
-    let _instance: Whole
-    let _lens: Lens<Whole, Part>
-
-    var name: GenericBoundLens<Whole, String> {
-        return GenericBoundLens<Whole, String>(
-            _instance: _instance,
-            _lens: _lens.compose(Person.Lenses.name)
-        )
+    var name: BoundLens<Whole, String> {
+        return BoundLens<Whole, String>(parent: self, sublens: Person.Lenses.name)
     }
 
-    var address: GenericAddressBoundLens<Whole> {
-        return GenericAddressBoundLens<Whole>(
-            _instance: _instance,
-            _lens: _lens.compose(Person.Lenses.address)
-        )
+    var address: BoundLensToAddress<Whole> {
+        return BoundLensToAddress<Whole>(parent: self, sublens: Person.Lenses.address)
     }
 }
 
-struct GenericAddressBoundLens<A>: BoundLens {
-    typealias Whole = A
+
+struct BoundLensToAddress<Whole>: BoundLensType {
     typealias Part = Address
+    let boundLensStorage: BoundLensStorage<Whole, Part>
 
-    let _instance: Whole
-    let _lens: Lens<Whole, Part>
-
-    var street: GenericBoundLens<Whole, String> {
-        return GenericBoundLens<Whole, String>(
-            _instance: _instance,
-            _lens: _lens.compose(Address.Lenses.street)
-        )
+    var street: BoundLens<Whole, String> {
+        return BoundLens<Whole, String>(parent: self, sublens: Address.Lenses.street)
     }
 }
 
@@ -190,15 +186,15 @@ func createIdentityLens<Whole>() -> Lens<Whole, Whole> {
 
 
 extension Person {
-    var lens: GenericPersonBoundLens<Person> {
-        return GenericPersonBoundLens<Person>(_instance: self, _lens: createIdentityLens())
+    var lens: BoundLensToPerson<Person> {
+        return BoundLensToPerson<Person>(instance: self, lens: createIdentityLens())
     }
 }
 
 
 extension Address {
-    var lens: GenericAddressBoundLens<Address> {
-        return GenericAddressBoundLens<Address>(_instance: self, _lens: createIdentityLens())
+    var lens: BoundLensToAddress<Address> {
+        return BoundLensToAddress<Address>(instance: self, lens: createIdentityLens())
     }
 }
 
