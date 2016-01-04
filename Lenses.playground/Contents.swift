@@ -1,3 +1,5 @@
+// Structs
+
 struct Person {
     let name: String
     let address: Address
@@ -8,7 +10,7 @@ struct Address {
 }
 
 
-
+// Debugging
 
 extension Person: CustomDebugStringConvertible {
     var debugDescription: String {
@@ -23,46 +25,12 @@ extension Address: CustomDebugStringConvertible {
 }
 
 
-
-
-let narf = Person(name: "Maciej Konieczny", address: Address(street: "Sesame Street"))
-
-
+// Lenses API
 
 struct Lens<Whole, Part> {
     let get: Whole -> Part
     let set: (Part, Whole) -> Whole
 }
-
-
-
-let personNameLens = Lens<Person, String>(
-    get: { $0.name },
-    set: { (newName, person) in
-        Person(name: newName, address: person.address)
-    }
-)
-
-
-personNameLens.set("narf", narf)
-
-
-
-let personAddressLens = Lens<Person, Address>(
-    get: { $0.address },
-    set: { (newAddress, person) in
-        Person(name: person.name, address: newAddress)
-    }
-)
-
-let addressStreetLens = Lens<Address, String>(
-    get: { $0.street },
-    set: { (newStreet, address) in
-        Address(street: newStreet)
-    }
-)
-
-
 
 extension Lens {
     func compose<Subpart>(other: Lens<Part, Subpart>) -> Lens<Whole, Subpart> {
@@ -84,35 +52,54 @@ extension Lens {
     }
 }
 
+private func createIdentityLens<Whole>() -> Lens<Whole, Whole> {
+    return Lens<Whole, Whole>(
+        get: { $0 },
+        set: { (new, old) in return new }
+    )
+}
 
-let personStreetLens = personAddressLens.compose(addressStreetLens)
-personStreetLens.get(narf)
 
-
+// Lenses for our structs, should be generated
 
 extension Person {
     struct Lenses {
-        static let name = personNameLens
-        static let address = personAddressLens
+        static let name = Lens<Person, String>(
+            get: { $0.name },
+            set: { (newName, person) in
+                Person(name: newName, address: person.address)
+            }
+        )
+
+        static let address = Lens<Person, Address>(
+            get: { $0.address },
+            set: { (newAddress, person) in
+                Person(name: person.name, address: newAddress)
+            }
+        )
     }
 }
 
 
 extension Address {
     struct Lenses {
-        static let street = addressStreetLens
+        static let street = Lens<Address, String>(
+            get: { $0.street },
+            set: { (newStreet, address) in
+                Address(street: newStreet)
+            }
+        )
     }
 }
 
 
-
-Person.Lenses.name.set("Kuba", narf)
-
+// Bound lenses API
 
 struct BoundLensStorage<Whole, Part> {
     let instance: Whole
     let lens: Lens<Whole, Part>
 }
+
 
 protocol BoundLensType {
     typealias Whole
@@ -151,6 +138,8 @@ struct BoundLens<Whole, Part>: BoundLensType {
 }
 
 
+// Bound lenses for our structs, should be generated
+
 struct BoundLensToPerson<Whole>: BoundLensType {
     typealias Part = Person
     let boundLensStorage: BoundLensStorage<Whole, Part>
@@ -164,7 +153,6 @@ struct BoundLensToPerson<Whole>: BoundLensType {
     }
 }
 
-
 struct BoundLensToAddress<Whole>: BoundLensType {
     typealias Part = Address
     let boundLensStorage: BoundLensStorage<Whole, Part>
@@ -175,22 +163,11 @@ struct BoundLensToAddress<Whole>: BoundLensType {
 }
 
 
-
-func createIdentityLens<Whole>() -> Lens<Whole, Whole> {
-    return Lens<Whole, Whole>(
-        get: { $0 },
-        set: { (new, old) in return new }
-    )
-}
-
-
-
 extension Person {
     var lens: BoundLensToPerson<Person> {
         return BoundLensToPerson<Person>(instance: self, lens: createIdentityLens())
     }
 }
-
 
 extension Address {
     var lens: BoundLensToAddress<Address> {
@@ -199,6 +176,10 @@ extension Address {
 }
 
 
+// Manual tests
+
+let narf = Person(name: "Maciej Konieczny", address: Address(street: "Sesame Street"))
+let familyNarf = Person.Lenses.name.set("Kuba", narf)
 
 narf.lens.name.get()
 narf.lens.name.set("narf")
