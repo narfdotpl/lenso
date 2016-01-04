@@ -164,13 +164,13 @@ struct BoundLensToAddress<Whole>: BoundLensType {
 
 
 extension Person {
-    var lens: BoundLensToPerson<Person> {
+    var throughLens: BoundLensToPerson<Person> {
         return BoundLensToPerson<Person>(instance: self, lens: createIdentityLens())
     }
 }
 
 extension Address {
-    var lens: BoundLensToAddress<Address> {
+    var throughLens: BoundLensToAddress<Address> {
         return BoundLensToAddress<Address>(instance: self, lens: createIdentityLens())
     }
 }
@@ -181,8 +181,8 @@ extension Address {
 let narf = Person(name: "Maciej Konieczny", address: Address(street: "Sesame Street"))
 let familyNarf = Person.Lenses.name.set("Kuba", narf)
 
-narf.lens.name.get()
-narf.lens.name.set("narf")
+narf.throughLens.name.get()
+narf.throughLens.name.set("narf")
 
-narf.lens.address.street.set("Baker Street")
-narf.address.lens.street.set("Baker Street")
+narf.throughLens.address.street.set("Baker Street")
+narf.address.throughLens.street.set("Baker Street")
