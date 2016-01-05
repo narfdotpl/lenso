@@ -44,5 +44,39 @@ struct Address {
 }
 """[1:])
 
+    def test_it_generates_lenses(self):
+        self.assertEqual(self.models[0].lens_source(), """
+extension Person {
+    struct Lenses {
+        static let name = Lens<Person, String>(
+            get: { $0.name },
+            set: { (newName, person) in
+                Person(name: newName, address: person.address)
+            }
+        )
+
+        static let address = Lens<Person, Address>(
+            get: { $0.address },
+            set: { (newAddress, person) in
+                Person(name: person.name, address: newAddress)
+            }
+        )
+    }
+}
+"""[1:])
+
+        self.assertEqual(self.models[1].lens_source(), """
+extension Address {
+    struct Lenses {
+        static let street = Lens<Address, String>(
+            get: { $0.street },
+            set: { (newStreet, address) in
+                Address(street: newStreet)
+            }
+        )
+    }
+}
+"""[1:])
+
 if __name__ == '__main__':
     unittest.main()
