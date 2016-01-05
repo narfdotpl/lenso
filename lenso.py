@@ -16,6 +16,20 @@ class Model(object):
     def from_dict(d):
         return Model(d['name'], map(Property.from_dict, d['properties']))
 
+    def _bound_lens_type(self):
+        return 'BoundLensTo%s' % self.name
+
+    def bound_lens_extension_source(self):
+        type = '%s<%s>' % (self._bound_lens_type(), self.name)
+
+        return """
+extension %s {
+    var throughLens: %s {
+        return %s(instance: self, lens: createIdentityLens())
+    }
+}
+"""[1:] % (self.name, type, type)
+
     def instance_name(self):
         return self.name[0].lower() + self.name[1:]
 

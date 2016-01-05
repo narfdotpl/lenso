@@ -78,5 +78,14 @@ extension Address {
 }
 """[1:])
 
+    def test_generates_extensions_for_bound_lenses(self):
+        self.assertEqual(self.models[0].bound_lens_extension_source(), """
+extension Person {
+    var throughLens: BoundLensToPerson<Person> {
+        return BoundLensToPerson<Person>(instance: self, lens: createIdentityLens())
+    }
+}
+"""[1:])
+
 if __name__ == '__main__':
     unittest.main()
