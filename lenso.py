@@ -17,7 +17,30 @@ class Model(object):
         return Model(d['name'], map(Property.from_dict, d['properties']))
 
     def _bound_lens_type(self):
-        return 'BoundLensTo%s' % self.name
+        return _bound_lens_type_for_type(self.name)
+
+    def _bound_lens_source(self, model_types):
+        source = """
+struct %s<Whole>: BoundLensType {
+    typealias Part = %s
+    let boundLensStorage: BoundLensStorage<Whole, Part>
+"""[1:] % (self._bound_lens_type(), self.name)
+
+        for p in self.properties:
+            if p.type in model_types:
+                bound_lens_type = _bound_lens_type_for_type(p.type) + '<Whole>'
+            else:
+                bound_lens_type = 'BoundLens<Whole, %s>' % p.type
+
+            source += """
+    var %s: %s {
+        return %s(parent: self, sublens: %s.Lenses.%s)
+    }
+""" % (p.name, bound_lens_type, bound_lens_type, self.name, p.name)
+
+        source += "}\n"
+
+        return source
 
     def bound_lens_extension_source(self):
         type = '%s<%s>' % (self._bound_lens_type(), self.name)
@@ -101,6 +124,16 @@ def parse_models_json(json_string):
     parsed_json = json.loads(json_string)
 
     return map(Model.from_dict, parsed_json['models'])
+
+
+def _bound_lens_type_for_type(type):
+    return 'BoundLensTo%s' % type
+
+
+def generate_bound_lenses(models):
+    model_types = [x.name for x in models]
+
+    return '\n'.join(x._bound_lens_source(model_types) for x in models)
 
 
 def main():

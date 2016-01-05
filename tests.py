@@ -78,7 +78,32 @@ extension Address {
 }
 """[1:])
 
-    def test_generates_extensions_for_bound_lenses(self):
+    def test_it_generates_bound_lenses(self):
+        self.assertEqual(lenso.generate_bound_lenses(self.models), """
+struct BoundLensToPerson<Whole>: BoundLensType {
+    typealias Part = Person
+    let boundLensStorage: BoundLensStorage<Whole, Part>
+
+    var name: BoundLens<Whole, String> {
+        return BoundLens<Whole, String>(parent: self, sublens: Person.Lenses.name)
+    }
+
+    var address: BoundLensToAddress<Whole> {
+        return BoundLensToAddress<Whole>(parent: self, sublens: Person.Lenses.address)
+    }
+}
+
+struct BoundLensToAddress<Whole>: BoundLensType {
+    typealias Part = Address
+    let boundLensStorage: BoundLensStorage<Whole, Part>
+
+    var street: BoundLens<Whole, String> {
+        return BoundLens<Whole, String>(parent: self, sublens: Address.Lenses.street)
+    }
+}
+"""[1:])
+
+    def test_it_generates_extensions_for_bound_lenses(self):
         self.assertEqual(self.models[0].bound_lens_extension_source(), """
 extension Person {
     var throughLens: BoundLensToPerson<Person> {
