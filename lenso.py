@@ -3,7 +3,87 @@
 
 from __future__ import absolute_import, division
 
+import fileinput
 import json
+
+
+_lenses_api = """
+struct Lens<Whole, Part> {
+    let get: Whole -> Part
+    let set: (Part, Whole) -> Whole
+}
+
+extension Lens {
+    func compose<Subpart>(other: Lens<Part, Subpart>) -> Lens<Whole, Subpart> {
+        return Lens<Whole, Subpart>(
+            get: { whole in
+                let part = self.get(whole)
+                let subpart = other.get(part)
+
+                return subpart
+            },
+            set: { (newSubpart, whole) in
+                let part = self.get(whole)
+                let newPart = other.set(newSubpart, part)
+                let newWhole = self.set(newPart, whole)
+
+                return newWhole
+            }
+        )
+    }
+}
+
+private func createIdentityLens<Whole>() -> Lens<Whole, Whole> {
+    return Lens<Whole, Whole>(
+        get: { $0 },
+        set: { (new, old) in return new }
+    )
+}
+"""[1:]
+
+_bound_lenses_api = """
+struct BoundLensStorage<Whole, Part> {
+    let instance: Whole
+    let lens: Lens<Whole, Part>
+}
+
+
+protocol BoundLensType {
+    typealias Whole
+    typealias Part
+
+    init(boundLensStorage: BoundLensStorage<Whole, Part>)
+
+    var boundLensStorage: BoundLensStorage<Whole, Part> { get }
+
+    func get() -> Part
+    func set(newPart: Part) -> Whole
+}
+
+extension BoundLensType {
+    init(instance: Whole, lens: Lens<Whole, Part>) {
+        self.init(boundLensStorage: BoundLensStorage(instance: instance, lens: lens))
+    }
+
+    init<Parent: BoundLensType where Parent.Whole == Whole>(parent: Parent, sublens: Lens<Parent.Part, Part>) {
+        let storage = parent.boundLensStorage
+        self.init(instance: storage.instance, lens: storage.lens.compose(sublens))
+    }
+
+    func get() -> Part {
+        return boundLensStorage.lens.get(boundLensStorage.instance)
+    }
+
+    func set(newPart: Part) -> Whole {
+        return boundLensStorage.lens.set(newPart, boundLensStorage.instance)
+    }
+}
+
+
+struct BoundLens<Whole, Part>: BoundLensType {
+    let boundLensStorage: BoundLensStorage<Whole, Part>
+}
+"""[1:]
 
 
 class Model(object):
@@ -136,8 +216,49 @@ def generate_bound_lenses(models):
     return '\n'.join(x._bound_lens_source(model_types) for x in models)
 
 
+def read_stdin():
+    text = ''
+    for line in fileinput.input():
+        text += line
+
+    return text
+
+
+def generate_full_source(models):
+    return """
+// Models generated from JSON
+
+%s
+
+// Lenses API
+
+%s
+
+// Bound lenses API
+
+%s
+
+// Generated lenses
+
+%s
+
+// Generated bound lenses
+
+%s
+
+%s
+"""[1:] % (
+        '\n'.join(x.struct_source() for x in models),
+        _lenses_api,
+        _bound_lenses_api,
+        '\n'.join(x.lens_source() for x in models),
+        generate_bound_lenses(models),
+        '\n'.join(x.bound_lens_extension_source() for x in models)
+    )
+
+
 def main():
-    pass
+    print generate_full_source(parse_models_json(read_stdin()))
 
 if __name__ == '__main__':
     main()

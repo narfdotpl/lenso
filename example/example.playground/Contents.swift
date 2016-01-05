@@ -1,4 +1,4 @@
-// Structs
+// Models generated from JSON
 
 struct Person {
     let name: String
@@ -7,21 +7,6 @@ struct Person {
 
 struct Address {
     let street: String
-}
-
-
-// Debugging
-
-extension Person: CustomDebugStringConvertible {
-    var debugDescription: String {
-        return "\(name) from \(address)"
-    }
-}
-
-extension Address: CustomDebugStringConvertible {
-    var debugDescription: String {
-        return street
-    }
 }
 
 
@@ -57,39 +42,6 @@ private func createIdentityLens<Whole>() -> Lens<Whole, Whole> {
         get: { $0 },
         set: { (new, old) in return new }
     )
-}
-
-
-// Lenses for our structs, should be generated
-
-extension Person {
-    struct Lenses {
-        static let name = Lens<Person, String>(
-            get: { $0.name },
-            set: { (newName, person) in
-                Person(name: newName, address: person.address)
-            }
-        )
-
-        static let address = Lens<Person, Address>(
-            get: { $0.address },
-            set: { (newAddress, person) in
-                Person(name: person.name, address: newAddress)
-            }
-        )
-    }
-}
-
-
-extension Address {
-    struct Lenses {
-        static let street = Lens<Address, String>(
-            get: { $0.street },
-            set: { (newStreet, address) in
-                Address(street: newStreet)
-            }
-        )
-    }
 }
 
 
@@ -138,7 +90,39 @@ struct BoundLens<Whole, Part>: BoundLensType {
 }
 
 
-// Bound lenses for our structs, should be generated
+// Generated lenses
+
+extension Person {
+    struct Lenses {
+        static let name = Lens<Person, String>(
+            get: { $0.name },
+            set: { (newName, person) in
+                Person(name: newName, address: person.address)
+            }
+        )
+
+        static let address = Lens<Person, Address>(
+            get: { $0.address },
+            set: { (newAddress, person) in
+                Person(name: person.name, address: newAddress)
+            }
+        )
+    }
+}
+
+extension Address {
+    struct Lenses {
+        static let street = Lens<Address, String>(
+            get: { $0.street },
+            set: { (newStreet, address) in
+                Address(street: newStreet)
+            }
+        )
+    }
+}
+
+
+// Generated bound lenses
 
 struct BoundLensToPerson<Whole>: BoundLensType {
     typealias Part = Person
@@ -176,7 +160,20 @@ extension Address {
 }
 
 
-// Manual tests
+
+// Manual testing
+
+extension Person: CustomDebugStringConvertible {
+    var debugDescription: String {
+        return "\(name) from \(address)"
+    }
+}
+
+extension Address: CustomDebugStringConvertible {
+    var debugDescription: String {
+        return street
+    }
+}
 
 let narf = Person(name: "Maciej Konieczny", address: Address(street: "Sesame Street"))
 let familyNarf = Person.Lenses.name.set("Kuba", narf)

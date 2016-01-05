@@ -1,0 +1,17 @@
+{
+    "models": [
+        {
+            "name": "Person",
+            "properties": [
+                {"name": "name", "type": "String"},
+                {"name": "address", "type": "Address"}
+            ]
+        },
+        {
+            "name": "Address",
+            "properties": [
+                {"name": "street", "type": "String"}
+            ]
+        }
+    ]
+}
