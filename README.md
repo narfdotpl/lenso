@@ -3,7 +3,21 @@ Lenso
 
 A Swift µframework and code generator for lenses — "functional getters and setters", convenient when changing parts of immutable objects.  Featuring dot notation, zero new operators.
 
-TODO: example image/snippet
+```swift
+struct Person {
+    let name: String
+    let address: Address
+}
+
+struct Address {
+    let street: String
+}
+
+let author = Person(name: "Maciej Konieczny", address: Address(street: "Sesame Street"))
+let author2 = author.throughLens.address.street.set("Baker Street")
+
+// generated lens code "hidden" in another file
+```
 
 TODO: intro in README, blog post
 
