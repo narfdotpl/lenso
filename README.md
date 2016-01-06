@@ -36,7 +36,11 @@ somewhere in your `$PATH`.
 Usage
 -----
 
-TODO: check out example
+Lenso is a command line application.  It takes as input models described in JSON and returns library code and generated lenses, so that you can keep them in one file:
+
+    cat models.json | lenso > lenses.swift
+
+See [example playground](example) to see it in action.
 
 
 Introduction to lenses
