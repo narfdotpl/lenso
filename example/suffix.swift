@@ -13,11 +13,14 @@ extension Address: CustomDebugStringConvertible {
     }
 }
 
-let narf = Person(name: "Maciej Konieczny", address: Address(street: "Sesame Street"))
-let familyNarf = Person.Lenses.name.set("Kuba", narf)
 
-narf.throughLens.name.get()
-narf.throughLens.name.set("narf")
+// use convenient bound lenses that know about the model hierarchy
+let author = Person(name: "Maciej Konieczny", address: Address(street: "Sesame Street"))
+let author2 = author.throughLens.address.street.set("Baker Street")
 
-narf.throughLens.address.street.set("Baker Street")
-narf.address.throughLens.street.set("Baker Street")
+// bound lenses are powered by regular (unbound) lenses...
+let author3 = Person.Lenses.name.set("narf", author)
+
+// ...that can be composed
+let personStreetLens = Person.Lenses.address.compose(Address.Lenses.street)
+let author4 = personStreetLens.set("Wisteria Lane", author)
