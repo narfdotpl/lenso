@@ -29,8 +29,9 @@ TODO: intro in README, blog post
 Installation
 ------------
 
-`lenso` is an executable [Python script](lenso) with no dependencies.  Put it
-somewhere in your `$PATH`.
+`lenso` is an executable [Python script](lenso) with no dependencies.  Put it somewhere in your `$PATH`.
+
+In the future I would like to port `lenso` to Swift and make it installable via [Homebrew](http://brew.sh/).
 
 
 Usage
@@ -41,6 +42,8 @@ Lenso is a command line application.  It takes as input models described in JSON
     cat models.json | lenso > lenses.swift
 
 See [example playground](example) to see it in action.
+
+Specifying all model properties in JSON is far from ideal.  In the future I would like to be able to inspect source files and generate lenses without extra configuration.
 
 
 Introduction to lenses
