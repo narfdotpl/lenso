@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 target=example.playground/Contents.swift
-cat models.json | ../lenso.py > $target
+cat models.json | ../lenso > $target
 cat suffix.swift >> $target

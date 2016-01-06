@@ -3,10 +3,8 @@
 
 import unittest
 
-import lenso
-# after `mv lenso.py lenso`:
-# from imp import load_source
-# lenso = load_source('lenso', 'lenso')
+from imp import load_source
+lenso = load_source('lenso', 'lenso')
 
 
 class Tests(unittest.TestCase):
