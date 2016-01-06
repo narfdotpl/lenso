@@ -1,5 +1,13 @@
 #!/usr/bin/env python
 # encoding: utf-8
+"""
+Lenso
+
+A Swift µframework and code generator for lenses — "functional getters and
+setters", convenient when changing parts of immutable objects.
+
+https://github.com/narfdotpl/lenso
+"""
 
 from __future__ import absolute_import, division
 
