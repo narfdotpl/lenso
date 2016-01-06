@@ -15,6 +15,9 @@ import fileinput
 import json
 
 
+VERSION = '0.1.0'
+
+
 _lenses_api = """
 struct Lens<Whole, Part> {
     let get: Whole -> Part
@@ -234,6 +237,9 @@ def read_stdin():
 
 def generate_full_source(models):
     return """
+// Code created by Lenso v%s
+// https://github.com/narfdotpl/lenso
+
 // Models generated from JSON
 
 %s
@@ -256,6 +262,7 @@ def generate_full_source(models):
 
 %s
 """[1:] % (
+        VERSION,
         '\n'.join(x.struct_source() for x in models),
         _lenses_api,
         _bound_lenses_api,

@@ -1,3 +1,6 @@
+// Code created by Lenso v0.1.0
+// https://github.com/narfdotpl/lenso
+
 // Models generated from JSON
 
 struct Person {
