@@ -29,7 +29,8 @@ TODO: intro in README, blog post
 Installation
 ------------
 
-TODO
+`lenso` is an executable [Python script](lenso) with no dependencies.  Put it
+somewhere in your `$PATH`.
 
 
 Usage
