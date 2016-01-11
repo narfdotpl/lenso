@@ -19,7 +19,10 @@ let author2 = author.throughLens.address.street.set("Baker Street")
 // generated lens code "hidden" in another file
 ```
 
-TODO: intro in README, blog post
+To learn about lenses, scroll down to [Introduction](#introduction-to-lenses).
+For more information and more story, check out my blog post [Lenses in Swift, or how to change parts of immutable objects][post].
+
+  [post]: http://narf.pl/posts/lenses-in-swift
 
 - Version 0.1.0 (following [Semantic Versioning](http://semver.org/))
 - Developed and tested using Xcode 7.2
@@ -48,6 +51,8 @@ Having to specify all model properties in JSON is far from ideal.  In the future
 
 Introduction to lenses
 ----------------------
+
+*For more information and more story, check out my blog post [Lenses in Swift, or how to change parts of immutable objects][post].*
 
 Lenses are "functional getters and setters" for immutable objects.  A lens is implemented for a `Whole` object and its `Part`.  You can "look through" the lens at an object to get its part — the lens acts as a getter.  You can also use the lens to change a part of an object.  Then it acts like a setter, except we are talking about immutable objects here, so after "setting", the lens returns a new `Whole` object with the new part swapped in.
 
