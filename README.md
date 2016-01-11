@@ -43,13 +43,13 @@ Lenso is a command line application.  It takes as input models described in JSON
 
 See [example playground](example) to see it in action.
 
-Specifying all model properties in JSON is far from ideal.  In the future I would like to be able to inspect source files and generate lenses without extra configuration.
+Having to specify all model properties in JSON is far from ideal.  In the future I would like to be able to inspect source files and generate lenses without extra configuration.
 
 
 Introduction to lenses
 ----------------------
 
-Lenses are "functional getters and setters" for immutable objects.  A lens is made for a `Whole` object and its `Part`.  You can "look through" the lens at an object to get its part — the lens acts as a getter.  You can also use the lens to change a part of an object.  Then it acts like a setter, except we are talking about immutable objects here, so after "setting", the lens returns a new `Whole` object with the new part swapped in.
+Lenses are "functional getters and setters" for immutable objects.  A lens is implemented for a `Whole` object and its `Part`.  You can "look through" the lens at an object to get its part — the lens acts as a getter.  You can also use the lens to change a part of an object.  Then it acts like a setter, except we are talking about immutable objects here, so after "setting", the lens returns a new `Whole` object with the new part swapped in.
 
 ```swift
 struct Lens<Whole, Part> {
@@ -92,6 +92,10 @@ Lenso generates code for such lenses for each specified model and puts them in a
 let author2 = Person.Lenses.name.set("narf", author)
 ```
 
+
+Composition
+-----------
+
 Lenses can also be composed: if you have a lens from A to B and a lens from B to C, you can make a new lens out them, from A to C:
 
 ```swift
@@ -117,7 +121,7 @@ I think this is a big win and it makes working with immutable objects easier.
 Meta
 ----
 
-Hello, my name is [Maciej Konieczny](http://narf.pl/).  I started playing with lenses and created Lenso (it means "a lens" in Esperanto) after watching Brandon Williams' talk [Lenses in Swift](https://www.youtube.com/watch?v=ofjehH9f-CU).  I recommend you watch it too, it's good! :)
+Hello, my name is [Maciej Konieczny](http://narf.pl/).  I started experimenting with lenses and created Lenso (it means "a lens" in Esperanto) after watching Brandon Williams' talk [Lenses in Swift](https://www.youtube.com/watch?v=ofjehH9f-CU).  I recommend you watch it too, it's good! :)
 
 By the way, I'm looking for a job, so if you’re working on a good product (an iOS app, a web service, a game, an ecosystem…), check out [my CV](http://narf.pl/cv), mention me to your boss, and get in touch via email at <hello@narf.pl>.
 
