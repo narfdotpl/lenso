@@ -16,8 +16,23 @@ struct Address {
 // Lenses API
 
 struct Lens<Whole, Part> {
-    let get: Whole -> Part
-    let set: (Part, Whole) -> Whole
+    @warn_unused_result
+    func get(whole: Whole) -> Part {
+        return _get(whole)
+    }
+
+    @warn_unused_result
+    func set(part: Part, _ whole: Whole) -> Whole {
+        return _set(part, whole)
+    }
+
+    private let _get: Whole -> Part
+    private let _set: (Part, Whole) -> Whole
+
+    init(get: Whole -> Part, set: (Part, Whole) -> Whole) {
+        _get = get
+        _set = set
+    }
 }
 
 extension Lens {
@@ -65,6 +80,8 @@ protocol BoundLensType {
     var boundLensStorage: BoundLensStorage<Whole, Part> { get }
 
     func get() -> Part
+
+    @warn_unused_result
     func set(newPart: Part) -> Whole
 }
 
@@ -82,6 +99,7 @@ extension BoundLensType {
         return boundLensStorage.lens.get(boundLensStorage.instance)
     }
 
+    @warn_unused_result
     func set(newPart: Part) -> Whole {
         return boundLensStorage.lens.set(newPart, boundLensStorage.instance)
     }
@@ -189,3 +207,7 @@ let author3 = Person.Lenses.name.set("narf", author)
 // ...that can be composed
 let personStreetLens = Person.Lenses.address.compose(Address.Lenses.street)
 let author4 = personStreetLens.set("Wisteria Lane", author)
+
+// the compiler will warn you about misused setters (both in bound and regular lenses)
+author.throughLens.address.street.set("Baker Street")
+personStreetLens.set("Wisteria Lane", author)
