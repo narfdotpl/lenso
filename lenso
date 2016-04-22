@@ -15,7 +15,7 @@ import fileinput
 import json
 
 
-VERSION = '0.1.0'
+VERSION = '0.2.0-dev'
 
 
 _lenses_api = """
@@ -60,8 +60,8 @@ struct BoundLensStorage<Whole, Part> {
 
 
 protocol BoundLensType {
-    typealias Whole
-    typealias Part
+    associatedtype Whole
+    associatedtype Part
 
     init(boundLensStorage: BoundLensStorage<Whole, Part>)
 

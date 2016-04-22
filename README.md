@@ -24,8 +24,8 @@ For more information and more story, check out my blog post [Lenses in Swift, or
 
   [post]: http://narf.pl/posts/lenses-in-swift
 
-- Version 0.1.0 (following [Semantic Versioning](http://semver.org/))
-- Developed and tested using Xcode 7.2
+- Version 0.2.0-dev (following [Semantic Versioning](http://semver.org/))
+- Developed and tested using Xcode 7.3
 - Published under the [MIT License](LICENSE)
 
 

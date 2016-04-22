@@ -1,4 +1,4 @@
-// Code created by Lenso v0.1.0
+// Code created by Lenso v0.2.0-dev
 // https://github.com/narfdotpl/lenso
 
 // Models generated from JSON
@@ -57,8 +57,8 @@ struct BoundLensStorage<Whole, Part> {
 
 
 protocol BoundLensType {
-    typealias Whole
-    typealias Part
+    associatedtype Whole
+    associatedtype Part
 
     init(boundLensStorage: BoundLensStorage<Whole, Part>)
 
